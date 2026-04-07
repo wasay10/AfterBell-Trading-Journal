@@ -1,29 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0d1117;
-  --foreground: #e6edf3;
-  --card: #161b22;
-  --card-border: #30363d;
-  --muted: #8b949e;
-  --green: #00c853;
-  --red: #ff1744;
-  --blue: #2979ff;
-  --purple: #7c4dff;
-  --orange: #ffc107;
+  --background: #0A0E12;
+  --surface: #111827;
+  --elevated: #1E293B;
+  --border: rgba(255, 255, 255, 0.08);
+  --text-primary: #E2E8F0;
+  --text-secondary: #94A3B8;
+  --text-hint: #64748B;
+  --cyan: #06B6D4;
+  --cyan-hover: #22D3EE;
+  --cyan-bg: rgba(6, 182, 212, 0.1);
+  --green: #10B981;
+  --red: #F43F5E;
+  --neutral: #64748B;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-border: var(--card-border);
-  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-hint: var(--text-hint);
+  --color-cyan: var(--cyan);
   --color-green: var(--green);
   --color-red: var(--red);
-  --color-blue: var(--blue);
-  --color-purple: var(--purple);
-  --color-orange: var(--orange);
 }
 
 * {
@@ -32,8 +34,9 @@
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Scrollbar */
@@ -42,18 +45,18 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0d1117;
+  background: #0A0E12;
 }
 ::-webkit-scrollbar-thumb {
-  background: #30363d;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #8b949e;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Number inputs */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  opacity: 0.5;
+  opacity: 0.4;
 }

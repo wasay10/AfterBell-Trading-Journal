@@ -27,8 +27,8 @@ export function formatPnl(value: number): string {
 }
 
 export function getPnlColor(value: number, breakevenCap = 0): string {
-  if (Math.abs(value) <= breakevenCap) return "text-blue-400";
-  return value > 0 ? "text-green-400" : "text-red-400";
+  if (Math.abs(value) <= breakevenCap) return "text-[#64748B]";
+  return value > 0 ? "text-[#10B981]" : "text-[#F43F5E]";
 }
 
 export function getTradeResult(

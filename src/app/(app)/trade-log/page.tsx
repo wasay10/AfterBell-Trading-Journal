@@ -86,24 +86,24 @@ export default function TradeLogPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-4 gap-3">
           <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8b949e]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search asset..."
-              className="w-full bg-[#161b22] border border-[#30363d] rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#7c4dff]"
+              className="w-full bg-[#111827] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm text-[#E2E8F0] placeholder-[#475569] focus:outline-none focus:border-[#06B6D4] focus:ring-1 focus:ring-[#06B6D4]/15 transition-all"
             />
           </div>
-          <p className="text-sm text-[#8b949e] shrink-0">{total} trades</p>
+          <p className="text-sm text-[#64748B] shrink-0">{total} trades</p>
         </div>
 
         {/* Table */}
-        <div className="bg-[#161b22] border border-[#21262d] rounded-xl overflow-hidden">
+        <div className="bg-[#111827] border border-white/[0.08] rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#21262d]">
+                <tr className="border-b border-white/[0.08] bg-white/[0.02]">
                   {[
                     { key: "date" as SortKey, label: "Date" },
                     { key: "asset" as SortKey, label: "Asset" },
@@ -119,8 +119,8 @@ export default function TradeLogPage() {
                       key={i}
                       onClick={() => key && handleSort(key)}
                       className={cn(
-                        "px-4 py-3 text-left text-xs font-semibold text-[#8b949e] uppercase tracking-wider whitespace-nowrap",
-                        key && "cursor-pointer hover:text-white"
+                        "px-4 py-3 text-left text-[11px] font-semibold text-[#64748B] uppercase tracking-[0.5px] whitespace-nowrap",
+                        key && "cursor-pointer hover:text-[#94A3B8] transition-colors"
                       )}
                     >
                       {label}
@@ -132,52 +132,46 @@ export default function TradeLogPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center text-[#8b949e]">
+                    <td colSpan={9} className="px-4 py-12 text-center text-[#64748B]">
                       Loading...
                     </td>
                   </tr>
                 ) : sorted.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center text-[#8b949e]">
-                      No trades yet. Click "+ New Trade" to add your first trade.
+                    <td colSpan={9} className="px-4 py-12 text-center text-[#64748B]">
+                      No trades yet. Click &quot;+ New Trade&quot; to add your first trade.
                     </td>
                   </tr>
                 ) : (
                   sorted.map((trade) => (
                     <Fragment key={trade.id}>
                       <tr
-                        onClick={() =>
-                          setExpandedId(expandedId === trade.id ? null : trade.id)
-                        }
-                        className="border-b border-[#21262d] hover:bg-[#1c2128] cursor-pointer transition-colors"
+                        onClick={() => setExpandedId(expandedId === trade.id ? null : trade.id)}
+                        className="border-b border-white/[0.05] hover:bg-white/[0.03] cursor-pointer transition-colors"
                       >
-                        <td className="px-4 py-3 text-[#8b949e] whitespace-nowrap text-xs">
+                        <td className="px-4 py-3 text-[#64748B] whitespace-nowrap text-xs">
                           {formatDate(trade.date)}
                         </td>
-                        <td className="px-4 py-3 font-semibold text-white whitespace-nowrap">
+                        <td className="px-4 py-3 font-semibold text-[#E2E8F0] whitespace-nowrap">
                           {trade.asset}
                         </td>
                         <td className="px-4 py-3">
-                          <span
-                            className={cn(
-                              "text-xs font-semibold px-2 py-0.5 rounded-full",
-                              trade.direction === "LONG"
-                                ? "bg-[#00c853]/20 text-[#00c853]"
-                                : "bg-[#ff1744]/20 text-[#ff1744]"
-                            )}
-                          >
+                          <span className={cn(
+                            "text-xs font-semibold px-2 py-0.5 rounded",
+                            trade.direction === "LONG"
+                              ? "bg-[#10B981]/15 text-[#10B981]"
+                              : "bg-[#F43F5E]/15 text-[#F43F5E]"
+                          )}>
                             {trade.direction}
                           </span>
                         </td>
-                        <td
-                          className={`px-4 py-3 font-mono font-semibold whitespace-nowrap ${getPnlColor(trade.pnl)}`}
-                        >
+                        <td className={`px-4 py-3 font-mono font-semibold whitespace-nowrap ${getPnlColor(trade.pnl)}`}>
                           {formatPnl(trade.pnl)}
                         </td>
-                        <td className="px-4 py-3 text-[#8b949e] font-mono">
+                        <td className="px-4 py-3 text-[#94A3B8] font-mono text-xs">
                           {trade.rr ? trade.rr.toFixed(1) : "—"}
                         </td>
-                        <td className="px-4 py-3 text-[#8b949e] text-xs whitespace-nowrap">
+                        <td className="px-4 py-3 text-[#94A3B8] text-xs whitespace-nowrap">
                           {trade.session?.name ?? "—"}
                         </td>
                         <td className="px-4 py-3">
@@ -185,13 +179,13 @@ export default function TradeLogPage() {
                             {trade.tradeTags.slice(0, 3).map((tt) => (
                               <span
                                 key={tt.tag.name}
-                                className="text-[10px] px-1.5 py-0.5 bg-[#7c4dff]/20 text-[#7c4dff] rounded-full"
+                                className="text-[10px] px-1.5 py-0.5 bg-[#06B6D4]/10 text-[#06B6D4] rounded border border-[#06B6D4]/20"
                               >
                                 {tt.tag.name}
                               </span>
                             ))}
                             {trade.tradeTags.length > 3 && (
-                              <span className="text-[10px] text-[#8b949e]">
+                              <span className="text-[10px] text-[#64748B]">
                                 +{trade.tradeTags.length - 3}
                               </span>
                             )}
@@ -199,24 +193,24 @@ export default function TradeLogPage() {
                         </td>
                         <td className="px-4 py-3">
                           {trade.rating ? (
-                            <span className="text-[#ffc107] text-xs">{"★".repeat(trade.rating)}</span>
+                            <span className="text-[#94A3B8] text-xs">{"★".repeat(trade.rating)}</span>
                           ) : trade.letterRating ? (
-                            <span className="text-[#ffc107] text-xs font-bold">{trade.letterRating}</span>
+                            <span className="text-[#94A3B8] text-xs font-bold">{trade.letterRating}</span>
                           ) : (
-                            <span className="text-[#8b949e] text-xs">—</span>
+                            <span className="text-[#475569] text-xs">—</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                             <button
                               onClick={() => setEditId(trade.id)}
-                              className="p-1.5 text-[#8b949e] hover:text-white hover:bg-[#21262d] rounded transition-colors"
+                              className="p-1.5 text-[#64748B] hover:text-[#E2E8F0] hover:bg-white/[0.06] rounded transition-all"
                             >
                               <Pencil className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => deleteTrade(trade.id)}
-                              className="p-1.5 text-[#8b949e] hover:text-red-400 hover:bg-[#21262d] rounded transition-colors"
+                              className="p-1.5 text-[#64748B] hover:text-[#F43F5E] hover:bg-[#F43F5E]/10 rounded transition-all"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -224,27 +218,27 @@ export default function TradeLogPage() {
                         </td>
                       </tr>
                       {expandedId === trade.id && (
-                        <tr className="bg-[#0d1117]">
+                        <tr className="bg-[#0A0E12]">
                           <td colSpan={9} className="px-6 py-4">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                               {trade.psychologyBefore && (
                                 <div>
-                                  <p className="text-[#8b949e] mb-0.5">Before</p>
-                                  <p className="text-white">{trade.psychologyBefore}</p>
+                                  <p className="text-[#64748B] mb-0.5">Before</p>
+                                  <p className="text-[#E2E8F0]">{trade.psychologyBefore}</p>
                                 </div>
                               )}
                               {trade.psychologyAfter && (
                                 <div>
-                                  <p className="text-[#8b949e] mb-0.5">After</p>
-                                  <p className="text-white">{trade.psychologyAfter}</p>
+                                  <p className="text-[#64748B] mb-0.5">After</p>
+                                  <p className="text-[#E2E8F0]">{trade.psychologyAfter}</p>
                                 </div>
                               )}
                               {trade.tradeMistakes.length > 0 && (
                                 <div>
-                                  <p className="text-[#8b949e] mb-1">Mistakes</p>
+                                  <p className="text-[#64748B] mb-1">Mistakes</p>
                                   <div className="flex flex-wrap gap-1">
                                     {trade.tradeMistakes.map((tm) => (
-                                      <span key={tm.mistake.name} className="px-1.5 py-0.5 bg-[#ff1744]/20 text-[#ff1744] rounded-full text-[10px]">
+                                      <span key={tm.mistake.name} className="px-1.5 py-0.5 bg-[#F43F5E]/15 text-[#F43F5E] rounded text-[10px] border border-[#F43F5E]/20">
                                         {tm.mistake.name}
                                       </span>
                                     ))}
@@ -253,8 +247,8 @@ export default function TradeLogPage() {
                               )}
                               {trade.notes && (
                                 <div className="col-span-2">
-                                  <p className="text-[#8b949e] mb-0.5">Notes</p>
-                                  <p className="text-white leading-relaxed">{trade.notes}</p>
+                                  <p className="text-[#64748B] mb-0.5">Notes</p>
+                                  <p className="text-[#E2E8F0] leading-relaxed">{trade.notes}</p>
                                 </div>
                               )}
                             </div>

@@ -38,19 +38,23 @@ export default function RegisterPage() {
     await signIn("google", { callbackUrl: "/dashboard" });
   };
 
+  const inputCls = "w-full bg-[#0A0E12] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-[#E2E8F0] placeholder-[#475569] focus:outline-none focus:border-[#06B6D4] transition-all";
+
   return (
-    <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0A0E12] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-[#7c4dff] flex items-center justify-center mb-4">
-            <TrendingUp className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-2xl bg-[#06B6D4]/15 border border-[#06B6D4]/30 flex items-center justify-center mb-4">
+            <TrendingUp className="w-6 h-6 text-[#06B6D4]" />
           </div>
-          <h1 className="text-2xl font-bold text-white">AfterBell</h1>
-          <p className="text-[#8b949e] text-sm mt-1">Start your trading journal today</p>
+          <h1 className="text-2xl font-bold">
+            <span className="text-[#E2E8F0]">After</span><span className="text-[#06B6D4]">Bell</span>
+          </h1>
+          <p className="text-[#64748B] text-sm mt-1">Start your trading journal today</p>
         </div>
 
-        <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-5">Create account</h2>
+        <div className="bg-[#111827] border border-white/[0.08] rounded-xl p-6">
+          <h2 className="text-base font-semibold text-[#E2E8F0] mb-5">Create account</h2>
 
           {/* Google */}
           <button
@@ -68,47 +72,47 @@ export default function RegisterPage() {
           </button>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 h-px bg-[#30363d]" />
-            <span className="text-xs text-[#8b949e]">or</span>
-            <div className="flex-1 h-px bg-[#30363d]" />
+            <div className="flex-1 h-px bg-white/[0.08]" />
+            <span className="text-xs text-[#64748B]">or</span>
+            <div className="flex-1 h-px bg-white/[0.08]" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs text-[#8b949e] mb-1.5">Display Name</label>
+              <label className="block text-xs text-[#94A3B8] mb-1.5">Display Name</label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="e.g. Wasay Syed"
-                className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#7c4dff]"
+                className={inputCls}
               />
             </div>
             <div>
-              <label className="block text-xs text-[#8b949e] mb-1.5">Email *</label>
+              <label className="block text-xs text-[#94A3B8] mb-1.5">Email *</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoFocus
-                className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#7c4dff]"
+                className={inputCls}
               />
             </div>
             <div>
-              <label className="block text-xs text-[#8b949e] mb-1.5">Password * (min 6 chars)</label>
+              <label className="block text-xs text-[#94A3B8] mb-1.5">Password * (min 6 chars)</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2.5 text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#7c4dff]"
+                className={inputCls}
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg px-3 py-2">
+              <p className="text-sm text-[#F43F5E] bg-[#F43F5E]/10 border border-[#F43F5E]/20 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
@@ -116,15 +120,15 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#7c4dff] hover:bg-[#9c6fff] disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors"
+              className="w-full bg-[#06B6D4] hover:bg-[#22D3EE] active:scale-[0.98] disabled:opacity-50 text-[#042F2E] font-semibold py-2.5 rounded-lg text-sm transition-all"
             >
               {loading ? "Creating account..." : "Create account"}
             </button>
           </form>
 
-          <p className="text-center text-sm text-[#8b949e] mt-4">
+          <p className="text-center text-sm text-[#64748B] mt-4">
             Already have an account?{" "}
-            <Link href="/login" className="text-[#7c4dff] hover:text-[#9c6fff]">
+            <Link href="/login" className="text-[#06B6D4] hover:text-[#22D3EE] transition-colors">
               Sign in
             </Link>
           </p>

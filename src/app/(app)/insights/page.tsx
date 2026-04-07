@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { formatPnl, getPnlColor } from "@/lib/utils";
+import { formatPnl } from "@/lib/utils";
 import {
   TrendingUp, TrendingDown, AlertTriangle, Award, Clock,
   Target, Zap, BarChart2,
@@ -55,17 +55,17 @@ const ICON_MAP: Record<string, React.ElementType> = {
 };
 
 const TYPE_STYLES: Record<string, string> = {
-  positive: "border-[#00c853]/30 bg-[#00c853]/5",
-  negative: "border-[#ff1744]/30 bg-[#ff1744]/5",
-  warning: "border-[#ffc107]/30 bg-[#ffc107]/5",
-  neutral: "border-[#30363d] bg-[#161b22]",
+  positive: "border-[#10B981]/25 bg-[#10B981]/[0.06]",
+  negative: "border-[#F43F5E]/25 bg-[#F43F5E]/[0.06]",
+  warning: "border-[#F59E0B]/25 bg-[#F59E0B]/[0.06]",
+  neutral: "border-white/[0.08] bg-[#111827]",
 };
 
 const ICON_COLORS: Record<string, string> = {
-  positive: "text-[#00c853]",
-  negative: "text-[#ff1744]",
-  warning: "text-[#ffc107]",
-  neutral: "text-[#7c4dff]",
+  positive: "text-[#10B981]",
+  negative: "text-[#F43F5E]",
+  warning: "text-[#F59E0B]",
+  neutral: "text-[#06B6D4]",
 };
 
 function generateInsights(
@@ -76,7 +76,6 @@ function generateInsights(
 ): Insight[] {
   const insights: Insight[] = [];
 
-  // Net P&L summary
   insights.push({
     icon: summary.netPnl >= 0 ? "trending_up" : "trending_down",
     title: "Overall Performance",
@@ -84,7 +83,6 @@ function generateInsights(
     type: summary.netPnl >= 0 ? "positive" : "negative",
   });
 
-  // Profit factor
   if (summary.profitFactor >= 2) {
     insights.push({
       icon: "award",
@@ -101,7 +99,6 @@ function generateInsights(
     });
   }
 
-  // Avg win vs loss
   if (summary.avgLoss > 0 && summary.avgWin / summary.avgLoss < 1) {
     insights.push({
       icon: "alert",
@@ -118,7 +115,6 @@ function generateInsights(
     });
   }
 
-  // Best tag
   const sortedByPnl = [...tagStats].sort((a, b) => b.netPnl - a.netPnl);
   if (sortedByPnl[0]?.totalTrades >= 3) {
     insights.push({
@@ -129,7 +125,6 @@ function generateInsights(
     });
   }
 
-  // Worst tag
   if (sortedByPnl.length > 1) {
     const worst = sortedByPnl[sortedByPnl.length - 1];
     if (worst.netPnl < 0 && worst.totalTrades >= 3) {
@@ -142,7 +137,6 @@ function generateInsights(
     }
   }
 
-  // Best emotion
   const sortedByEmotion = [...emotionStats].sort((a, b) => b.winRate - a.winRate);
   if (sortedByEmotion[0]?.totalTrades >= 3) {
     insights.push({
@@ -153,7 +147,6 @@ function generateInsights(
     });
   }
 
-  // Worst emotion
   if (sortedByEmotion.length > 1) {
     const worst = sortedByEmotion[sortedByEmotion.length - 1];
     if (worst.totalTrades >= 3 && worst.winRate < 40) {
@@ -166,7 +159,6 @@ function generateInsights(
     }
   }
 
-  // Most costly mistake
   const sortedMistakes = [...mistakeStats].sort((a, b) => a.totalCost - b.totalCost);
   if (sortedMistakes[0]?.count >= 2) {
     const m = sortedMistakes[0];
@@ -178,7 +170,6 @@ function generateInsights(
     });
   }
 
-  // High win rate
   if (summary.winRate >= 60 && summary.totalTrades >= 10) {
     insights.push({
       icon: "chart",
@@ -222,22 +213,22 @@ export default function InsightsPage() {
     <AppShell title="Insights" onTradeAdded={load}>
       <div className="p-4 max-w-screen-lg mx-auto">
         {loading ? (
-          <p className="text-[#8b949e] text-sm text-center py-12">Loading...</p>
+          <p className="text-[#64748B] text-sm text-center py-12">Loading...</p>
         ) : totalTrades < MIN_TRADES ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#161b22] border border-[#30363d] flex items-center justify-center mb-4">
-              <BarChart2 className="w-8 h-8 text-[#8b949e]" />
+            <div className="w-16 h-16 rounded-2xl bg-[#111827] border border-white/[0.08] flex items-center justify-center mb-4">
+              <BarChart2 className="w-8 h-8 text-[#64748B]" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Not enough data yet</h2>
-            <p className="text-[#8b949e] text-sm max-w-sm">
-              Add at least {MIN_TRADES} trades to unlock AI-powered insights about your trading patterns.
+            <h2 className="text-xl font-semibold text-[#E2E8F0] mb-2">Not enough data yet</h2>
+            <p className="text-[#94A3B8] text-sm max-w-sm">
+              Add at least {MIN_TRADES} trades to unlock insights about your trading patterns.
             </p>
-            <p className="text-xs text-[#8b949e] mt-2">
+            <p className="text-xs text-[#64748B] mt-2">
               {totalTrades}/{MIN_TRADES} trades logged
             </p>
-            <div className="mt-4 w-48 h-1.5 bg-[#21262d] rounded-full overflow-hidden">
+            <div className="mt-4 w-48 h-1.5 bg-white/[0.08] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#7c4dff] rounded-full transition-all"
+                className="h-full bg-[#06B6D4] rounded-full transition-all"
                 style={{ width: `${(totalTrades / MIN_TRADES) * 100}%` }}
               />
             </div>
@@ -247,17 +238,14 @@ export default function InsightsPage() {
             {insights.map((insight, i) => {
               const Icon = ICON_MAP[insight.icon] ?? BarChart2;
               return (
-                <div
-                  key={i}
-                  className={`rounded-xl border p-4 ${TYPE_STYLES[insight.type]}`}
-                >
+                <div key={i} className={`rounded-xl border p-4 ${TYPE_STYLES[insight.type]}`}>
                   <div className="flex items-start gap-3">
                     <div className={`mt-0.5 shrink-0 ${ICON_COLORS[insight.type]}`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-white mb-1">{insight.title}</p>
-                      <p className="text-xs text-[#8b949e] leading-relaxed">{insight.body}</p>
+                      <p className="text-sm font-semibold text-[#E2E8F0] mb-1">{insight.title}</p>
+                      <p className="text-xs text-[#94A3B8] leading-relaxed">{insight.body}</p>
                     </div>
                   </div>
                 </div>

@@ -20,7 +20,7 @@ export function AppShell({ title, children, user, onTradeAdded }: AppShellProps)
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#0d1117] overflow-hidden">
+    <div className="flex h-screen bg-[#0A0E12] overflow-hidden">
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
