@@ -240,7 +240,7 @@ export default function DashboardPage() {
                   <AreaChart data={data.equityCurve} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="eq" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.2} />
+                        <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.08} />
                         <stop offset="95%" stopColor="#06B6D4" stopOpacity={0} />
                       </linearGradient>
                     </defs>
