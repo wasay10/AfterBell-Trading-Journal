@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     newMistakes,
   } = body;
 
-  if (!asset || !direction || !date || pnl === undefined) {
+  if (!asset || !direction || !date || pnl == null || isNaN(Number(pnl))) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       direction,
       date: new Date(date),
       pnl: parseFloat(pnl),
-      rr: rr ? parseFloat(rr) : null,
+      rr: rr != null && !isNaN(Number(rr)) ? parseFloat(rr) : null,
       sessionId: sessionId || null,
       rating: rating ?? null,
       letterRating: letterRating ?? null,
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
   // Update user balance
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { currentBalance: { increment: parseFloat(pnl) } },
+    data: { currentBalance: { increment: Number(pnl) } },
   });
 
   return NextResponse.json(trade, { status: 201 });

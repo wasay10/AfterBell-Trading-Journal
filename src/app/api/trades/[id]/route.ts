@@ -54,8 +54,8 @@ export async function PUT(
       asset,
       direction,
       date: new Date(date),
-      pnl: parseFloat(pnl),
-      rr: rr ? parseFloat(rr) : null,
+      pnl: Number(pnl),
+      rr: rr != null && !isNaN(Number(rr)) ? Number(rr) : null,
       sessionId: sessionId || null,
       rating: rating ?? null,
       letterRating: letterRating ?? null,
@@ -78,7 +78,7 @@ export async function PUT(
   });
 
   // Recalculate balance
-  const pnlDiff = parseFloat(pnl) - existing.pnl;
+  const pnlDiff = Number(pnl) - existing.pnl;
   if (pnlDiff !== 0) {
     await prisma.user.update({
       where: { id: session.user.id },

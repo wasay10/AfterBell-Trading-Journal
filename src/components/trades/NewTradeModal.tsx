@@ -213,7 +213,10 @@ export function NewTradeModal({ onClose, onSaved, tradeId }: NewTradeModalProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!asset.trim()) { setError("Asset is required"); return; }
-    if (pnl === "") { setError("P&L is required"); return; }
+    const pnlNum = parseFloat(pnl);
+    if (pnl === "" || isNaN(pnlNum)) { setError("P&L must be a valid number"); return; }
+    const rrNum = rr ? parseFloat(rr) : null;
+    if (rr && (rrNum === null || isNaN(rrNum))) { setError("R:R must be a valid number"); return; }
     setError("");
     setLoading(true);
 
@@ -221,8 +224,8 @@ export function NewTradeModal({ onClose, onSaved, tradeId }: NewTradeModalProps)
       asset: asset.trim().toUpperCase(),
       direction,
       date,
-      pnl: parseFloat(pnl),
-      rr: rr ? parseFloat(rr) : null,
+      pnl: pnlNum,
+      rr: rrNum,
       sessionId: sessionId || null,
       rating: userSettings.ratingStyle === "STARS" ? (rating || null) : null,
       letterRating: userSettings.ratingStyle === "GRADES" ? (letterRating || null) : null,

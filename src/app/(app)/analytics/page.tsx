@@ -191,8 +191,8 @@ export default function AnalyticsPage() {
                               {tag.winRate.toFixed(1)}%
                             </span>
                           </td>
-                          <td className={`px-4 py-2.5 font-mono text-xs ${getPnlColor(tag.netPnl / tag.totalTrades)}`}>
-                            {formatPnl(tag.netPnl / tag.totalTrades)}
+                          <td className={`px-4 py-2.5 font-mono text-xs ${tag.totalTrades > 0 ? getPnlColor(tag.netPnl / tag.totalTrades) : "text-[#8b949e]"}`}>
+                            {tag.totalTrades > 0 ? formatPnl(tag.netPnl / tag.totalTrades) : "$0.00"}
                           </td>
                           <td className={`px-4 py-2.5 font-mono text-xs font-semibold ${getPnlColor(tag.netPnl)}`}>
                             {formatPnl(tag.netPnl)}
