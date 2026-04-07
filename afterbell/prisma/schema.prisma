@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  passwordHash     String
+  displayName      String           @default("")
+  startingBalance  Float            @default(0)
+  currentBalance   Float            @default(0)
+  breakevenCap     Float            @default(0)
+  ratingStyle      RatingStyle      @default(STARS)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  trades           Trade[]
+  tags             Tag[]
+  mistakes         Mistake[]
+  sessions         TradingSession[]
+}
+
+model Trade {
+  id               String          @id @default(cuid())
+  userId           String
+  asset            String
+  direction        Direction
+  date             DateTime
+  pnl              Float
+  rr               Float?
+  sessionId        String?
+  rating           Int?
+  letterRating     String?
+  notes            String?
+  psychologyBefore String?
+  psychologyAfter  String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session          TradingSession? @relation(fields: [sessionId], references: [id])
+  tradeTags        TradeTag[]
+  tradeMistakes    TradeMistake[]
+  screenshots      Screenshot[]
+}
+
+model Tag {
+  id        String     @id @default(cuid())
+  userId    String
+  name      String
+  isCustom  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradeTags TradeTag[]
+
+  @@unique([userId, name])
+}
+
+model Mistake {
+  id            String         @id @default(cuid())
+  userId        String
+  name          String
+  isCustom      Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradeMistakes TradeMistake[]
+
+  @@unique([userId, name])
+}
+
+model TradeTag {
+  tradeId String
+  tagId   String
+
+  trade   Trade  @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([tradeId, tagId])
+}
+
+model TradeMistake {
+  tradeId   String
+  mistakeId String
+
+  trade     Trade   @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  mistake   Mistake @relation(fields: [mistakeId], references: [id], onDelete: Cascade)
+
+  @@id([tradeId, mistakeId])
+}
+
+model Screenshot {
+  id        String   @id @default(cuid())
+  tradeId   String
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  trade     Trade    @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+}
+
+model TradingSession {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  startTime String
+  endTime   String
+  timezone  String   @default("America/New_York")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades    Trade[]
+
+  @@unique([userId, name])
+}
+
+enum Direction {
+  LONG
+  SHORT
+}
+
+enum RatingStyle {
+  STARS
+  GRADES
+}
