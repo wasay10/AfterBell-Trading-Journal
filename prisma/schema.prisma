@@ -54,6 +54,9 @@ model Trade {
   date             DateTime
   pnl              Float
   rr               Float?
+  entryTime        String?
+  drawOnLiquidity  String?
+  newsDriver       String?
   sessionId        String?
   rating           Int?
   letterRating     String?

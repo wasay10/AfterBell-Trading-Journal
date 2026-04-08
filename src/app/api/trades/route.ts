@@ -55,6 +55,9 @@ export async function POST(req: NextRequest) {
     date,
     pnl,
     rr,
+    entryTime,
+    drawOnLiquidity,
+    newsDriver,
     sessionId,
     rating,
     letterRating,
@@ -65,6 +68,7 @@ export async function POST(req: NextRequest) {
     mistakeIds,
     newTags,
     newMistakes,
+    screenshotUrls,
   } = body;
 
   if (!asset || !direction || !date || pnl == null || isNaN(Number(pnl))) {
@@ -108,6 +112,9 @@ export async function POST(req: NextRequest) {
       date: new Date(date),
       pnl: parseFloat(pnl),
       rr: rr != null && !isNaN(Number(rr)) ? parseFloat(rr) : null,
+      entryTime: entryTime || null,
+      drawOnLiquidity: drawOnLiquidity || null,
+      newsDriver: newsDriver || null,
       sessionId: sessionId || null,
       rating: rating ?? null,
       letterRating: letterRating ?? null,
@@ -119,6 +126,9 @@ export async function POST(req: NextRequest) {
         : undefined,
       tradeMistakes: allMistakeIds.length
         ? { create: allMistakeIds.map((mistakeId: string) => ({ mistakeId })) }
+        : undefined,
+      screenshots: screenshotUrls?.length
+        ? { create: (screenshotUrls as string[]).map((url: string, order: number) => ({ url, order })) }
         : undefined,
     },
     include: {

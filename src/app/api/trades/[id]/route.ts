@@ -39,14 +39,17 @@ export async function PUT(
 
   const body = await req.json();
   const {
-    asset, direction, date, pnl, rr, sessionId,
-    rating, letterRating, notes, psychologyBefore, psychologyAfter,
-    tagIds, mistakeIds,
+    asset, direction, date, pnl, rr, entryTime, drawOnLiquidity, newsDriver,
+    sessionId, rating, letterRating, notes, psychologyBefore, psychologyAfter,
+    tagIds, mistakeIds, screenshotUrls,
   } = body;
 
   // Delete existing relations then recreate
   await prisma.tradeTag.deleteMany({ where: { tradeId: id } });
   await prisma.tradeMistake.deleteMany({ where: { tradeId: id } });
+  if (screenshotUrls?.length) {
+    await prisma.screenshot.deleteMany({ where: { tradeId: id } });
+  }
 
   const trade = await prisma.trade.update({
     where: { id },
@@ -56,6 +59,9 @@ export async function PUT(
       date: new Date(date),
       pnl: Number(pnl),
       rr: rr != null && !isNaN(Number(rr)) ? Number(rr) : null,
+      entryTime: entryTime || null,
+      drawOnLiquidity: drawOnLiquidity || null,
+      newsDriver: newsDriver || null,
       sessionId: sessionId || null,
       rating: rating ?? null,
       letterRating: letterRating ?? null,
@@ -67,6 +73,9 @@ export async function PUT(
         : undefined,
       tradeMistakes: (mistakeIds ?? []).length
         ? { create: (mistakeIds ?? []).map((mistakeId: string) => ({ mistakeId })) }
+        : undefined,
+      screenshots: screenshotUrls?.length
+        ? { create: (screenshotUrls as string[]).map((url: string, order: number) => ({ url, order })) }
         : undefined,
     },
     include: {
