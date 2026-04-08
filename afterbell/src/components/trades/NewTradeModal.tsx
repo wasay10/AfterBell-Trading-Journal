@@ -86,7 +86,8 @@ export function NewTradeModal({ onClose, onSaved, tradeId }: NewTradeModalProps)
   const [pnl, setPnl] = useState("");
   const [rr, setRr] = useState("");
   const [entryTime, setEntryTime] = useState("");
-  const [drawOnLiquidity, setDrawOnLiquidity] = useState("");
+  const [selectedDols, setSelectedDols] = useState<string[]>([]);
+  const [customDol, setCustomDol] = useState("");
   const [newsDriver, setNewsDriver] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [notes, setNotes] = useState("");
@@ -145,7 +146,13 @@ export function NewTradeModal({ onClose, onSaved, tradeId }: NewTradeModalProps)
       setPnl(String(t.pnl ?? ""));
       setRr(t.rr != null ? String(t.rr) : "");
       setEntryTime(t.entryTime ?? "");
-      setDrawOnLiquidity(t.drawOnLiquidity ?? "");
+      if (t.drawOnLiquidity) {
+        const parts = t.drawOnLiquidity.split(",").map((s: string) => s.trim()).filter(Boolean);
+        const presetParts = parts.filter((p: string) => DOL_PRESETS.includes(p));
+        const customParts = parts.filter((p: string) => !DOL_PRESETS.includes(p));
+        setSelectedDols(presetParts);
+        setCustomDol(customParts.join(", "));
+      }
       setNewsDriver(t.newsDriver ?? "");
       setSessionId(t.sessionId ?? "");
       setNotes(t.notes ?? "");
@@ -224,7 +231,10 @@ export function NewTradeModal({ onClose, onSaved, tradeId }: NewTradeModalProps)
       direction, date,
       pnl: pnlNum, rr: rrNum,
       entryTime: entryTime || null,
-      drawOnLiquidity: drawOnLiquidity || null,
+      drawOnLiquidity: (() => {
+        const parts = [...selectedDols, ...(customDol.trim() ? [customDol.trim()] : [])];
+        return parts.length > 0 ? parts.join(", ") : null;
+      })(),
       newsDriver: newsDriver || null,
       sessionId: sessionId || null,
       rating: null,
@@ -317,17 +327,28 @@ export function NewTradeModal({ onClose, onSaved, tradeId }: NewTradeModalProps)
                 </div>
               </div>
               <div className="col-span-2">
-                <label className="block text-xs text-[#94A3B8] mb-1">Draw on Liquidity</label>
+                <label className="block text-xs text-[#94A3B8] mb-1">
+                  Draw on Liquidity
+                  {selectedDols.length > 0 && (
+                    <span className="ml-2 text-[#06B6D4] font-mono">{selectedDols.join(", ")}{customDol.trim() ? `, ${customDol.trim()}` : ""}</span>
+                  )}
+                </label>
                 <div className="flex gap-1.5 mb-2 flex-wrap">
-                  {DOL_PRESETS.map((p) => (
-                    <button key={p} type="button" onClick={() => setDrawOnLiquidity(drawOnLiquidity === p ? "" : p)}
-                      className={cn("px-2.5 py-1 rounded text-[11px] font-semibold border transition-all",
-                        drawOnLiquidity === p ? "bg-[#06B6D4]/15 border-[#06B6D4]/50 text-[#06B6D4]"
-                        : "bg-[#0A0E12] border-white/10 text-[#64748B] hover:border-white/20 hover:text-[#94A3B8]")}>{p}</button>
-                  ))}
+                  {DOL_PRESETS.map((p) => {
+                    const active = selectedDols.includes(p);
+                    return (
+                      <button key={p} type="button"
+                        onClick={() => setSelectedDols((prev) => active ? prev.filter((d) => d !== p) : [...prev, p])}
+                        className={cn("px-2.5 py-1 rounded text-[11px] font-semibold border transition-all",
+                          active ? "bg-[#06B6D4]/15 border-[#06B6D4]/50 text-[#06B6D4]"
+                          : "bg-[#0A0E12] border-white/10 text-[#64748B] hover:border-white/20 hover:text-[#94A3B8]")}>
+                        {p}
+                      </button>
+                    );
+                  })}
                 </div>
-                <input type="text" value={drawOnLiquidity} onChange={(e) => setDrawOnLiquidity(e.target.value)}
-                  placeholder="e.g. BSL, SSL, EQH, or custom level" className={inputCls} />
+                <input type="text" value={customDol} onChange={(e) => setCustomDol(e.target.value)}
+                  placeholder="Custom level (e.g. PWMH, Daily High)…" className={inputCls} />
               </div>
             </div>
           </section>

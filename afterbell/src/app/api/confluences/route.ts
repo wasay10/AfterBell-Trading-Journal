@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_CONFLUENCES } from "@/lib/utils";
 
 export async function GET() {
   const session = await auth();
@@ -13,7 +14,6 @@ export async function GET() {
 
   // Auto-seed defaults for users who registered before seeding was added
   if (confluences.length === 0) {
-    const { DEFAULT_CONFLUENCES } = await import("@/lib/utils");
     await prisma.confluence.createMany({
       data: DEFAULT_CONFLUENCES.map((c) => ({
         userId: session.user.id,
