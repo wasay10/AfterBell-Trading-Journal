@@ -134,6 +134,62 @@ export function buildEquityCurve(
   return points;
 }
 
+export interface ThunderScore {
+  total: number;           // 0–100
+  winPct: number;          // axis score 0–100
+  profitFactor: number;    // axis score 0–100
+  avgWL: number;           // axis score 0–100
+  consistency: number;     // axis score 0–100
+  recovery: number;        // axis score 0–100
+  maxDrawdownPct: number;  // raw % of starting balance, for the gauge bar
+}
+
+export function calculateThunderScore(
+  s: TradeSummary,
+  startingBalance: number
+): ThunderScore {
+  if (s.totalTrades === 0) {
+    return { total: 0, winPct: 0, profitFactor: 0, avgWL: 0, consistency: 0, recovery: 0, maxDrawdownPct: 0 };
+  }
+
+  // Win % axis: 50% WR → 50 score, 70%+ → 100
+  const winPct = Math.min(s.winRate, 100);
+
+  // Profit Factor axis: PF 1 = 33, PF 2 = 66, PF 3+ = 100
+  const pfScore = Math.min((s.profitFactor / 3) * 100, 100);
+
+  // Avg W/L axis: ratio 1 = 33, ratio 2 = 66, ratio 3+ = 100
+  const ratio = s.avgLoss > 0 ? s.avgWin / s.avgLoss : (s.avgWin > 0 ? 3 : 0);
+  const avgWL = Math.min((ratio / 3) * 100, 100);
+
+  // Consistency: day win rate (how many trading days are profitable)
+  const consistency = Math.min(s.dayWinRate, 100);
+
+  // Recovery: inverse of max drawdown as % of starting balance
+  // 0% DD = 100, 10% DD = 80, 25% DD = 50, 50%+ DD = 0
+  const maxDrawdownPct = startingBalance > 0 ? (s.maxDrawdown / startingBalance) * 100 : 0;
+  const recovery = Math.max(0, 100 - maxDrawdownPct * 2);
+
+  // Weighted total
+  const total = Math.round(
+    winPct * 0.25 +
+    pfScore * 0.25 +
+    avgWL * 0.20 +
+    consistency * 0.15 +
+    recovery * 0.15
+  );
+
+  return {
+    total: Math.min(Math.max(total, 0), 100),
+    winPct: Math.round(winPct),
+    profitFactor: Math.round(pfScore),
+    avgWL: Math.round(avgWL),
+    consistency: Math.round(consistency),
+    recovery: Math.round(recovery),
+    maxDrawdownPct,
+  };
+}
+
 export function buildDailyPnl(
   trades: { pnl: number; date: Date | string }[]
 ) {

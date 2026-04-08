@@ -27,8 +27,8 @@ export function formatPnl(value: number): string {
 }
 
 export function getPnlColor(value: number, breakevenCap = 0): string {
-  if (Math.abs(value) <= breakevenCap) return "text-blue-400";
-  return value > 0 ? "text-green-400" : "text-red-400";
+  if (Math.abs(value) <= breakevenCap) return "text-[#64748B]";
+  return value > 0 ? "text-[#10B981]" : "text-[#F43F5E]";
 }
 
 export function getTradeResult(
@@ -90,3 +90,32 @@ export const DEFAULT_SESSIONS = [
 ];
 
 export const LETTER_GRADES = ["A+", "A", "B", "C", "D", "F"];
+
+export const CONFLUENCE_POINTS: Record<string, number> = {
+  HIGH: 50,
+  MEDIUM: 15,
+  LOW: 5,
+};
+
+export function computeGradeFromScore(score: number): string | null {
+  if (score === 0) return null;
+  if (score < 20) return "F";
+  if (score < 40) return "D";
+  if (score < 60) return "C";
+  if (score < 80) return "B";
+  if (score < 95) return "A";
+  return "A+";
+}
+
+export const DEFAULT_CONFLUENCES = [
+  { name: "Displacement",        priority: "HIGH"   },
+  { name: "Speed of Displacement", priority: "HIGH" },
+  { name: "BOS / CHoCH",         priority: "HIGH"   },
+  { name: "Order Block",         priority: "MEDIUM" },
+  { name: "Fair Value Gap",      priority: "MEDIUM" },
+  { name: "Liquidity Sweep",     priority: "MEDIUM" },
+  { name: "HTF Confluence",      priority: "MEDIUM" },
+  { name: "Kill Zone",           priority: "LOW"    },
+  { name: "Session Open",        priority: "LOW"    },
+  { name: "News Alignment",      priority: "LOW"    },
+];

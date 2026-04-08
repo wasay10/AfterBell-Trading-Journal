@@ -1,16 +1,16 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
   id               String           @id @default(cuid())
   email            String           @unique
-  passwordHash     String
+  passwordHash     String?
   displayName      String           @default("")
   startingBalance  Float            @default(0)
   currentBalance   Float            @default(0)
@@ -23,6 +23,28 @@ model User {
   tags             Tag[]
   mistakes         Mistake[]
   sessions         TradingSession[]
+  accounts         Account[]
+  confluences      Confluence[]
+}
+
+// NextAuth OAuth accounts
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Trade {
@@ -33,6 +55,9 @@ model Trade {
   date             DateTime
   pnl              Float
   rr               Float?
+  entryTime        String?
+  drawOnLiquidity  String?
+  newsDriver       String?
   sessionId        String?
   rating           Int?
   letterRating     String?
@@ -46,6 +71,7 @@ model Trade {
   session          TradingSession? @relation(fields: [sessionId], references: [id])
   tradeTags        TradeTag[]
   tradeMistakes    TradeMistake[]
+  tradeConfluences TradeConfluence[]
   screenshots      Screenshot[]
 }
 
@@ -75,6 +101,19 @@ model Mistake {
   @@unique([userId, name])
 }
 
+model Confluence {
+  id               String             @id @default(cuid())
+  userId           String
+  name             String
+  priority         ConfluencePriority @default(MEDIUM)
+  createdAt        DateTime           @default(now())
+
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradeConfluences TradeConfluence[]
+
+  @@unique([userId, name])
+}
+
 model TradeTag {
   tradeId String
   tagId   String
@@ -93,6 +132,16 @@ model TradeMistake {
   mistake   Mistake @relation(fields: [mistakeId], references: [id], onDelete: Cascade)
 
   @@id([tradeId, mistakeId])
+}
+
+model TradeConfluence {
+  tradeId      String
+  confluenceId String
+
+  trade      Trade      @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  confluence Confluence @relation(fields: [confluenceId], references: [id], onDelete: Cascade)
+
+  @@id([tradeId, confluenceId])
 }
 
 model Screenshot {
@@ -129,4 +178,10 @@ enum Direction {
 enum RatingStyle {
   STARS
   GRADES
+}
+
+enum ConfluencePriority {
+  HIGH
+  MEDIUM
+  LOW
 }

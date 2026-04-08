@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { DEFAULT_MISTAKES, DEFAULT_SESSIONS } from "@/lib/utils";
+import { DEFAULT_MISTAKES, DEFAULT_SESSIONS, DEFAULT_CONFLUENCES } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
   const { email, password, displayName } = await req.json();
@@ -41,6 +41,15 @@ export async function POST(req: NextRequest) {
     data: DEFAULT_SESSIONS.map((s) => ({
       userId: user.id,
       ...s,
+    })),
+  });
+
+  // Seed default confluences
+  await prisma.confluence.createMany({
+    data: DEFAULT_CONFLUENCES.map((c) => ({
+      userId: user.id,
+      name: c.name,
+      priority: c.priority as "HIGH" | "MEDIUM" | "LOW",
     })),
   });
 

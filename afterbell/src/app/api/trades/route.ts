@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { CONFLUENCE_POINTS, computeGradeFromScore } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -31,6 +32,7 @@ export async function GET(req: NextRequest) {
       include: {
         tradeTags: { include: { tag: true } },
         tradeMistakes: { include: { mistake: true } },
+        tradeConfluences: { include: { confluence: true } },
         screenshots: { orderBy: { order: "asc" } },
         session: true,
       },
@@ -50,24 +52,15 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const {
-    asset,
-    direction,
-    date,
-    pnl,
-    rr,
-    sessionId,
-    rating,
-    letterRating,
-    notes,
-    psychologyBefore,
-    psychologyAfter,
-    tagIds,
-    mistakeIds,
-    newTags,
-    newMistakes,
+    asset, direction, date, pnl, rr,
+    entryTime, drawOnLiquidity, newsDriver,
+    sessionId, rating, letterRating,
+    notes, psychologyBefore, psychologyAfter,
+    tagIds, mistakeIds, confluenceIds,
+    newTags, newMistakes, screenshotUrls,
   } = body;
 
-  if (!asset || !direction || !date || pnl === undefined) {
+  if (!asset || !direction || !date || pnl == null || isNaN(Number(pnl))) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -97,6 +90,16 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // Auto-grade from confluences
+  let computedGrade: string | null = null;
+  if (confluenceIds?.length) {
+    const cfls = await prisma.confluence.findMany({
+      where: { id: { in: confluenceIds }, userId: session.user.id },
+    });
+    const score = cfls.reduce((sum, c) => sum + (CONFLUENCE_POINTS[c.priority] ?? 0), 0);
+    computedGrade = computeGradeFromScore(score);
+  }
+
   const allTagIds = [...(tagIds ?? []), ...createdTagIds];
   const allMistakeIds = [...(mistakeIds ?? []), ...createdMistakeIds];
 
@@ -107,10 +110,13 @@ export async function POST(req: NextRequest) {
       direction,
       date: new Date(date),
       pnl: parseFloat(pnl),
-      rr: rr ? parseFloat(rr) : null,
+      rr: rr != null && !isNaN(Number(rr)) ? parseFloat(rr) : null,
+      entryTime: entryTime || null,
+      drawOnLiquidity: drawOnLiquidity || null,
+      newsDriver: newsDriver || null,
       sessionId: sessionId || null,
-      rating: rating ?? null,
-      letterRating: letterRating ?? null,
+      rating: confluenceIds?.length ? null : (rating ?? null),
+      letterRating: computedGrade ?? (letterRating || null),
       notes: notes ?? null,
       psychologyBefore: psychologyBefore ?? null,
       psychologyAfter: psychologyAfter ?? null,
@@ -120,19 +126,25 @@ export async function POST(req: NextRequest) {
       tradeMistakes: allMistakeIds.length
         ? { create: allMistakeIds.map((mistakeId: string) => ({ mistakeId })) }
         : undefined,
+      tradeConfluences: (confluenceIds ?? []).length
+        ? { create: (confluenceIds as string[]).map((confluenceId) => ({ confluenceId })) }
+        : undefined,
+      screenshots: screenshotUrls?.length
+        ? { create: (screenshotUrls as string[]).map((url: string, order: number) => ({ url, order })) }
+        : undefined,
     },
     include: {
       tradeTags: { include: { tag: true } },
       tradeMistakes: { include: { mistake: true } },
+      tradeConfluences: { include: { confluence: true } },
       screenshots: true,
       session: true,
     },
   });
 
-  // Update user balance
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { currentBalance: { increment: parseFloat(pnl) } },
+    data: { currentBalance: { increment: Number(pnl) } },
   });
 
   return NextResponse.json(trade, { status: 201 });
